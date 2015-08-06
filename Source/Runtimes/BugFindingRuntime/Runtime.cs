@@ -195,13 +195,13 @@ namespace Microsoft.PSharp
                 
                 Task task = new Task(() =>
                 {
-                    PSharpRuntime.BugFinder.NotifyTaskStarted(Task.CurrentId);
+                    PSharpRuntime.BugFinder.NotifyTaskStarted();
 
                     (machine as Machine).AssignInitialPayload(payload);
                     (machine as Machine).GotoStartState();
                     (machine as Machine).RunEventHandler();
 
-                    PSharpRuntime.BugFinder.NotifyTaskCompleted(Task.CurrentId);
+                    PSharpRuntime.BugFinder.NotifyTaskCompleted();
                 });
 
                 lock (PSharpRuntime.Lock)
@@ -214,7 +214,7 @@ namespace Microsoft.PSharp
                 task.Start();
 
                 PSharpRuntime.BugFinder.WaitForTaskToStart(task.Id);
-                PSharpRuntime.BugFinder.Schedule(Task.CurrentId);
+                PSharpRuntime.BugFinder.Schedule();
 
                 return mid;
             }
@@ -273,17 +273,17 @@ namespace Microsoft.PSharp
 
             if (!runHandler)
             {
-                PSharpRuntime.BugFinder.Schedule(Task.CurrentId);
+                PSharpRuntime.BugFinder.Schedule();
                 return;
             }
 
             Task task = new Task(() =>
             {
-                PSharpRuntime.BugFinder.NotifyTaskStarted(Task.CurrentId);
+                PSharpRuntime.BugFinder.NotifyTaskStarted();
 
                 machine.RunEventHandler();
 
-                PSharpRuntime.BugFinder.NotifyTaskCompleted(Task.CurrentId);
+                PSharpRuntime.BugFinder.NotifyTaskCompleted();
             });
 
             lock (PSharpRuntime.Lock)
@@ -296,7 +296,7 @@ namespace Microsoft.PSharp
             task.Start();
 
             PSharpRuntime.BugFinder.WaitForTaskToStart(task.Id);
-            PSharpRuntime.BugFinder.Schedule(Task.CurrentId);
+            PSharpRuntime.BugFinder.Schedule();
         }
 
         /// <summary>
@@ -320,7 +320,7 @@ namespace Microsoft.PSharp
         /// </summary>
         internal static void NotifyDefaultHandlerFired()
         {
-            PSharpRuntime.BugFinder.Schedule(Task.CurrentId);
+            PSharpRuntime.BugFinder.Schedule();
         }
 
         /// <summary>
