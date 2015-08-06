@@ -266,6 +266,18 @@ namespace Microsoft.PSharp
                 ErrorReporter.ReportAndExit("Cannot send a null event.");
             }
 
+            MachineId currentMachineId = PSharpRuntime.BugFinder.CurrentMachineId;
+            if (currentMachineId == null)
+            {
+                Output.Debug(DebugType.Runtime, "<SendLog> Event '{0}' sent to machine '{1}({2})'.",
+                    e.GetType(), mid.Type, mid.MVal);
+            }
+            else
+            {
+                Output.Debug(DebugType.Runtime, "<SendLog> Machine '{0}({1})' sent event '{2}' " +
+                    "to '{3}({4})'.", currentMachineId.Type, currentMachineId.MVal, e.GetType(), mid.Type, mid.MVal);
+            }
+
             var machine = PSharpRuntime.MachineMap[mid.Value];
 
             var runHandler = false;

@@ -86,6 +86,20 @@ namespace Microsoft.PSharp.Scheduling
             this.SchedulingPoints = 0;
         }
 
+        internal MachineId CurrentMachineId
+        {
+            get
+            {
+                int? id = Task.CurrentId;
+                if (id == null)
+                    return null;
+                TaskInfo taskInfo;
+                if (!TaskMap.TryGetValue(id.Value, out taskInfo))
+                    return null;
+                return taskInfo.Machine.Id;
+            }
+        }
+
         /// <summary>
         /// Schedules the next machine to execute.
         /// </summary>

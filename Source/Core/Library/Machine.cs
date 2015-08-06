@@ -231,8 +231,6 @@ namespace Microsoft.PSharp
             this.Assert(e != null, "Machine '{0}' is sending a null event.", this.GetType().Name);
 
             e.AssignPayload(payload);
-            Output.Debug(DebugType.Runtime, "<SendLog> Machine '{0}({1})' sent event '{2}' " +
-                "to '{3}({4})'.", this, this.Id.MVal, e.GetType(), mid.Type, mid.MVal);
             Machine.Dispatcher.Send(mid, e);
         }
 
