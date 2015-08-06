@@ -80,6 +80,14 @@ namespace Microsoft.PSharp
 
         #region public API
 
+        public static MachineId CurrentMachineId
+        {
+            get
+            {
+                return PSharpRuntime.BugFinder.CurrentMachineId;
+            }
+        }
+
         /// <summary>
         /// Creates a new machine of the given type with an optional payload.
         /// </summary>

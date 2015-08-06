@@ -36,6 +36,8 @@ namespace Microsoft.PSharp
         /// </summary>
         private static Dictionary<int, Machine> MachineMap;
 
+        private static Dictionary<int, MachineId> TaskMap;
+
         /// <summary>
         /// Ip address.
         /// </summary>
@@ -75,6 +77,20 @@ namespace Microsoft.PSharp
 
             PSharpRuntime.IpAddress = "";
             PSharpRuntime.Port = "";
+        }
+
+        public static MachineId CurrentMachineId
+        {
+            get
+            {
+                int? id = Task.CurrentId;
+                if (id == null)
+                    return null;
+                MachineId mid;
+                if (!TaskMap.TryGetValue(id.Value, out mid))
+                    return null;
+                return mid;
+            }
         }
 
         /// <summary>
@@ -182,9 +198,17 @@ namespace Microsoft.PSharp
                 
                 Task task = new Task(() =>
                 {
-                    (machine as Machine).AssignInitialPayload(payload);
-                    (machine as Machine).GotoStartState();
-                    (machine as Machine).RunEventHandler();
+                    TaskMap.Add(Task.CurrentId.Value, mid);
+                    try
+                    {
+                        (machine as Machine).AssignInitialPayload(payload);
+                        (machine as Machine).GotoStartState();
+                        (machine as Machine).RunEventHandler();
+                    }
+                    finally
+                    {
+                        TaskMap.Remove(Task.CurrentId.Value);
+                    }
                 });
 
                 task.Start();
@@ -236,7 +260,15 @@ namespace Microsoft.PSharp
 
             Task task = new Task(() =>
             {
-                machine.RunEventHandler();
+                TaskMap.Add(Task.CurrentId.Value, mid);
+                try
+                {
+                    machine.RunEventHandler();
+                }
+                finally
+                {
+                    TaskMap.Remove(Task.CurrentId.Value);
+                }
             });
 
             task.Start();
