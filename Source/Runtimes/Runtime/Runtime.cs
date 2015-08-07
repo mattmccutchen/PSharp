@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 
 using Microsoft.PSharp.Remote;
 using Microsoft.PSharp.Tooling;
+using System.Threading;
 
 namespace Microsoft.PSharp
 {
@@ -36,7 +37,8 @@ namespace Microsoft.PSharp
         /// </summary>
         private static Dictionary<int, Machine> MachineMap;
 
-        private static Dictionary<int, MachineId> TaskMap;
+        [ThreadStatic]
+        private static MachineId currentMachineId;
 
         /// <summary>
         /// Ip address.
@@ -68,6 +70,7 @@ namespace Microsoft.PSharp
         static PSharpRuntime()
         {
             PSharpRuntime.MachineMap = new Dictionary<int, Machine>();
+            Thread t = Thread.CurrentThread;
 
             MachineId.ResetMachineIDCounter();
 
@@ -83,13 +86,7 @@ namespace Microsoft.PSharp
         {
             get
             {
-                int? id = Task.CurrentId;
-                if (id == null)
-                    return null;
-                MachineId mid;
-                if (!TaskMap.TryGetValue(id.Value, out mid))
-                    return null;
-                return mid;
+                return currentMachineId;
             }
         }
 
@@ -198,7 +195,7 @@ namespace Microsoft.PSharp
                 
                 Task task = new Task(() =>
                 {
-                    TaskMap.Add(Task.CurrentId.Value, mid);
+                    currentMachineId = mid;
                     try
                     {
                         (machine as Machine).AssignInitialPayload(payload);
@@ -207,7 +204,7 @@ namespace Microsoft.PSharp
                     }
                     finally
                     {
-                        TaskMap.Remove(Task.CurrentId.Value);
+                        currentMachineId = null;
                     }
                 });
 
@@ -260,14 +257,14 @@ namespace Microsoft.PSharp
 
             Task task = new Task(() =>
             {
-                TaskMap.Add(Task.CurrentId.Value, mid);
+                currentMachineId = mid;
                 try
                 {
                     machine.RunEventHandler();
                 }
                 finally
                 {
-                    TaskMap.Remove(Task.CurrentId.Value);
+                    currentMachineId = null;
                 }
             });
 

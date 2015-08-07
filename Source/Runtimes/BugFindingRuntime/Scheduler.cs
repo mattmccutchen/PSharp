@@ -20,6 +20,8 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Microsoft.PSharp.Tooling;
+using System.Diagnostics;
+using System.Threading;
 
 namespace Microsoft.PSharp.Scheduling
 {
@@ -44,6 +46,11 @@ namespace Microsoft.PSharp.Scheduling
         /// Map from task ids to task infos.
         /// </summary>
         private Dictionary<int, TaskInfo> TaskMap;
+
+        /// <summary>
+        /// TaskInfo for the machine task executing on the current thread.
+        /// </summary>
+        private ThreadLocal<TaskInfo> CurrentTaskInfo;
 
         /// <summary>
         /// True if a bug was found.
@@ -82,6 +89,7 @@ namespace Microsoft.PSharp.Scheduling
             this.Strategy = strategy;
             this.Tasks = new List<TaskInfo>();
             this.TaskMap = new Dictionary<int, TaskInfo>();
+            this.CurrentTaskInfo = new ThreadLocal<TaskInfo>();
             this.BugFound = false;
             this.SchedulingPoints = 0;
         }
@@ -90,13 +98,7 @@ namespace Microsoft.PSharp.Scheduling
         {
             get
             {
-                int? id = Task.CurrentId;
-                if (id == null)
-                    return null;
-                TaskInfo taskInfo;
-                if (!TaskMap.TryGetValue(id.Value, out taskInfo))
-                    return null;
-                return taskInfo.Machine.Id;
+                return CurrentTaskInfo.Value?.Machine.Id;
             }
         }
 
@@ -106,13 +108,11 @@ namespace Microsoft.PSharp.Scheduling
         /// <param name="id">TaskId</param>
         internal void Schedule()
         {
-            int? id = Task.CurrentId;
-            if (id == null || !this.TaskMap.ContainsKey((int)id))
+            TaskInfo taskInfo = CurrentTaskInfo.Value;
+            if (taskInfo == null)
             {
                 return;
             }
-
-            var taskInfo = this.TaskMap[(int)id];
 
             TaskInfo next = null;
             if (Configuration.DepthBound > 0 && this.SchedulingPoints == Configuration.DepthBound)
@@ -242,16 +242,10 @@ namespace Microsoft.PSharp.Scheduling
         /// <summary>
         /// Notify that the task has started.
         /// </summary>
-        /// <param name="id">TaskId</param>
         internal void NotifyTaskStarted()
         {
-            int? id = Task.CurrentId;
-            if (id == null)
-            {
-                return;
-            }
-
-            var taskInfo = this.TaskMap[(int)id];
+            TaskInfo taskInfo = this.TaskMap[Task.CurrentId.Value];
+            CurrentTaskInfo.Value = taskInfo;
 
             Output.Debug(DebugType.Testing, "<ScheduleDebug> Started task {0} of machine {1}({2}).",
                 taskInfo.Id, taskInfo.Machine.GetType(), taskInfo.Machine.Id.MVal);
@@ -279,17 +273,10 @@ namespace Microsoft.PSharp.Scheduling
         /// <summary>
         /// Notify that the task has completed.
         /// </summary>
-        /// <param name="id">TaskId</param>
         internal void NotifyTaskCompleted()
         {
-            int? id = Task.CurrentId;
-            if (id == null)
-            {
-                return;
-            }
+            TaskInfo taskInfo = CurrentTaskInfo.Value;
             
-            var taskInfo = this.TaskMap[(int)id];
-
             Output.Debug(DebugType.Testing, "<ScheduleDebug> Completed task {0} of machine {1}({2}).",
                 taskInfo.Id, taskInfo.Machine.GetType(), taskInfo.Machine.Id.MVal);
 
@@ -298,6 +285,7 @@ namespace Microsoft.PSharp.Scheduling
 
             this.Schedule();
 
+            CurrentTaskInfo.Value = null;
             Output.Debug(DebugType.Testing, "<ScheduleDebug> Exit task {0} of machine {1}({2}).",
                 taskInfo.Id, taskInfo.Machine.GetType(), taskInfo.Machine.Id.MVal);
         }

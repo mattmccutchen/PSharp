@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using Microsoft.PSharp.Scheduling;
 using Microsoft.PSharp.StateCaching;
 using Microsoft.PSharp.Tooling;
+using System.Threading;
 
 namespace Microsoft.PSharp
 {
@@ -54,7 +55,7 @@ namespace Microsoft.PSharp
         /// <summary>
         /// The main thread id.
         /// </summary>
-        private static int? MainThreadId;
+        private static Thread MainThread;
 
         /// <summary>
         /// True if runtime is running. False otherwise.
@@ -147,7 +148,7 @@ namespace Microsoft.PSharp
             if (!predicate)
             {
                 var terminateScheduler = true;
-                if (Task.CurrentId == PSharpRuntime.MainThreadId)
+                if (Thread.CurrentThread == PSharpRuntime.MainThread)
                 {
                     terminateScheduler = false;
                 }
@@ -169,7 +170,7 @@ namespace Microsoft.PSharp
             if (!predicate)
             {
                 var terminateScheduler = true;
-                if (Task.CurrentId == PSharpRuntime.MainThreadId)
+                if (Thread.CurrentThread == PSharpRuntime.MainThread)
                 {
                     terminateScheduler = false;
                 }
@@ -439,7 +440,7 @@ namespace Microsoft.PSharp
         /// </summary>
         private static void Initialize()
         {
-            PSharpRuntime.MainThreadId = Task.CurrentId;
+            PSharpRuntime.MainThread = Thread.CurrentThread;
 
             PSharpRuntime.MachineTasks = new List<Task>();
             PSharpRuntime.MachineMap = new Dictionary<int, Machine>();
