@@ -102,13 +102,34 @@ namespace Microsoft.PSharp.Scheduling
             }
         }
 
+        private TaskInfo GetTaskInfoChecked()
+        {
+            if (Thread.CurrentThread == PSharpRuntime.MainThread)
+            {
+                return null;  // TODO: fix the handling of the main thread
+            }
+            TaskInfo taskInfo = CurrentTaskInfo.Value;
+            if (taskInfo == null)
+            {
+                throw new InvalidOperationException("Calling P# API from outside a machine task");
+            }
+            return taskInfo;
+        }
+
+        internal void CheckCancellation()
+        {
+            TaskInfo taskInfo = GetTaskInfoChecked();
+            if (taskInfo != null && !taskInfo.IsEnabled)
+                throw new TaskCanceledException();
+        }
+
         /// <summary>
         /// Schedules the next machine to execute.
         /// </summary>
         /// <param name="id">TaskId</param>
         internal void Schedule()
         {
-            TaskInfo taskInfo = CurrentTaskInfo.Value;
+            TaskInfo taskInfo = GetTaskInfoChecked();
             if (taskInfo == null)
             {
                 return;
@@ -324,6 +345,8 @@ namespace Microsoft.PSharp.Scheduling
         /// <param name="terminateScheduler">Terminate the scheduler</param>
         internal void NotifyAssertionFailure(string text, bool terminateScheduler = true)
         {
+            CheckCancellation();  // Help keep the first assertion.
+
             this.BugReport = text;
             ErrorReporter.Report(text);
 

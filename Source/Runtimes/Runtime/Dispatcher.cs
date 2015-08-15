@@ -148,6 +148,11 @@ namespace Microsoft.PSharp
             // No-op for real execution.
         }
 
+        void IDispatcher.CheckCancellation()
+        {
+            // No-op for real execution.
+        }
+
         #endregion
     }
 }

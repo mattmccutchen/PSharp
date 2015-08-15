@@ -436,6 +436,8 @@ namespace Microsoft.PSharp
             Event nextEvent = null;
             while (!this.IsHalted)
             {
+                Machine.Dispatcher.CheckCancellation();
+
                 var defaultHandling = false;
                 lock (this.Inbox)
                 {

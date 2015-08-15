@@ -55,7 +55,7 @@ namespace Microsoft.PSharp
         /// <summary>
         /// The main thread id.
         /// </summary>
-        private static Thread MainThread;
+        internal static Thread MainThread;
 
         /// <summary>
         /// True if runtime is running. False otherwise.
@@ -118,14 +118,17 @@ namespace Microsoft.PSharp
         {
             e.AssignPayload(payload);
 
-            try
-            {
-                PSharpRuntime.Send(target, e);
-            }
-            catch (TaskCanceledException)
-            {
-                Output.Log("<Exception> TaskCanceledException was thrown.");
-            }
+            // Matt: Disable the catch because it was allowing machines to keep
+            // passing messages indefinitely after cancellation.  If it was
+            // serving some purpose, we can find another solution later.
+            //try
+            //{
+            PSharpRuntime.Send(target, e);
+            //}
+            //catch (TaskCanceledException)
+            //{
+            //    Output.Log("<Exception> TaskCanceledException was thrown.");
+            //}
         }
 
         /// <summary>
@@ -192,6 +195,8 @@ namespace Microsoft.PSharp
         /// <returns>Machine id</returns>
         internal static MachineId TryCreateMachine(Type type, params Object[] payload)
         {
+            PSharpRuntime.BugFinder.CheckCancellation();
+
             if (type.IsSubclassOf(typeof(Machine)))
             {
                 Object machine = Activator.CreateInstance(type);
@@ -266,6 +271,8 @@ namespace Microsoft.PSharp
         /// <param name="e">Event</param>
         internal static void Send(MachineId mid, Event e)
         {
+            PSharpRuntime.BugFinder.CheckCancellation();
+
             if (mid == null)
             {
                 ErrorReporter.ReportAndExit("Cannot send to a null machine.");

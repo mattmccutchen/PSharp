@@ -139,6 +139,11 @@ namespace Microsoft.PSharp
             PSharpRuntime.NotifyDefaultHandlerFired();
         }
 
+        void IDispatcher.CheckCancellation()
+        {
+            PSharpRuntime.BugFinder.CheckCancellation();
+        }
+
         #endregion
     }
 }
