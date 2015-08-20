@@ -434,10 +434,8 @@ namespace Microsoft.PSharp
             }
 
             Event nextEvent = null;
-            while (!this.IsHalted)
+            while (!this.IsHalted && !Machine.Dispatcher.IsCanceled())
             {
-                Machine.Dispatcher.CheckCancellation();
-
                 var defaultHandling = false;
                 lock (this.Inbox)
                 {
@@ -819,11 +817,6 @@ namespace Microsoft.PSharp
             }
             catch (Exception ex)
             {
-                if (Debugger.IsAttached)
-                {
-                    throw ex;
-                }
-
                 // Handles generic exception.
                 this.ReportGenericAssertion(ex);
             }
@@ -856,11 +849,6 @@ namespace Microsoft.PSharp
             }
             catch (Exception ex)
             {
-                if (Debugger.IsAttached)
-                {
-                    throw ex;
-                }
-
                 // Handles generic exception.
                 this.ReportGenericAssertion(ex);
             }
@@ -894,11 +882,6 @@ namespace Microsoft.PSharp
             }
             catch (Exception ex)
             {
-                if (Debugger.IsAttached)
-                {
-                    throw ex;
-                }
-
                 // Handles generic exception.
                 this.ReportGenericAssertion(ex);
             }

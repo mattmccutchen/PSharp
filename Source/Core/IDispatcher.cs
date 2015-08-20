@@ -105,8 +105,8 @@ namespace Microsoft.PSharp
         void NotifyDefaultHandlerFired();
 
         /// <summary>
-        /// Throws TaskCanceledException if the scheduler is stopping.
+        /// Returns true if the scheduler is stopping.
         /// </summary>
-        void CheckCancellation();
+        bool IsCanceled();
     }
 }

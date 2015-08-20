@@ -195,8 +195,6 @@ namespace Microsoft.PSharp
         /// <returns>Machine id</returns>
         internal static MachineId TryCreateMachine(Type type, params Object[] payload)
         {
-            PSharpRuntime.BugFinder.CheckCancellation();
-
             if (type.IsSubclassOf(typeof(Machine)))
             {
                 Object machine = Activator.CreateInstance(type);
@@ -206,6 +204,13 @@ namespace Microsoft.PSharp
                 
                 Output.Debug(DebugType.Runtime, "<CreateLog> Machine {0}({1}) is created.",
                     type.Name, mid.MVal);
+
+                if (PSharpRuntime.BugFinder.IsCanceled())
+                {
+                    Output.Debug(DebugType.Runtime, "<CreateLog> Not starting machine {0}({1}) because the current machine is canceled.",
+                        type.Name, mid.MVal);
+                    return mid;
+                }
                 
                 Task task = new Task(() =>
                 {
@@ -271,8 +276,6 @@ namespace Microsoft.PSharp
         /// <param name="e">Event</param>
         internal static void Send(MachineId mid, Event e)
         {
-            PSharpRuntime.BugFinder.CheckCancellation();
-
             if (mid == null)
             {
                 ErrorReporter.ReportAndExit("Cannot send to a null machine.");
@@ -280,6 +283,11 @@ namespace Microsoft.PSharp
             else if (e == null)
             {
                 ErrorReporter.ReportAndExit("Cannot send a null event.");
+            }
+
+            if (PSharpRuntime.BugFinder.IsCanceled())
+            {
+                Output.Debug(DebugType.Runtime, "<SendLog> Ignoring send because the current machine is canceled.");
             }
 
             MachineId currentMachineId = PSharpRuntime.BugFinder.CurrentMachineId;
@@ -414,13 +422,14 @@ namespace Microsoft.PSharp
                     taskArray = PSharpRuntime.MachineTasks.ToArray();
                 }
 
-                try
+                // Make sure every task exits.
+                foreach (Task task in taskArray)
                 {
-                    Task.WaitAll(taskArray);
-                }
-                catch (AggregateException)
-                {
-                    break;
+                    try
+                    {
+                        task.Wait();
+                    }
+                    catch (AggregateException) { }
                 }
 
                 bool moreTasksExist = false;

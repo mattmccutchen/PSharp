@@ -148,9 +148,10 @@ namespace Microsoft.PSharp
             // No-op for real execution.
         }
 
-        void IDispatcher.CheckCancellation()
+        bool IDispatcher.IsCanceled()
         {
             // No-op for real execution.
+            return false;
         }
 
         #endregion

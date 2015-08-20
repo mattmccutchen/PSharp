@@ -116,11 +116,10 @@ namespace Microsoft.PSharp.Scheduling
             return taskInfo;
         }
 
-        internal void CheckCancellation()
+        internal bool IsCanceled()
         {
             TaskInfo taskInfo = GetTaskInfoChecked();
-            if (taskInfo != null && !taskInfo.IsEnabled)
-                throw new TaskCanceledException();
+            return (taskInfo != null && !taskInfo.IsEnabled);
         }
 
         /// <summary>
@@ -130,7 +129,7 @@ namespace Microsoft.PSharp.Scheduling
         internal void Schedule()
         {
             TaskInfo taskInfo = GetTaskInfoChecked();
-            if (taskInfo == null)
+            if (taskInfo == null || IsCanceled() /* can this happen? */)
             {
                 return;
             }
@@ -141,13 +140,13 @@ namespace Microsoft.PSharp.Scheduling
                 Output.Debug(DebugType.Testing, "<ScheduleDebug> Depth bound of {0} reached.",
                     Configuration.DepthBound);
                 this.KillRemainingTasks();
-                throw new TaskCanceledException();
+                return;  // Allow current machine to return to event loop.
             }
             else if (!this.Strategy.TryGetNext(out next, this.Tasks))
             {
                 Output.Debug(DebugType.Testing, "<ScheduleDebug> Schedule explored.");
                 this.KillRemainingTasks();
-                throw new TaskCanceledException();
+                return;  // Allow current machine to return to event loop.
             }
 
             if (Configuration.CheckLiveness && Configuration.CacheProgramState &&
@@ -191,7 +190,7 @@ namespace Microsoft.PSharp.Scheduling
 
                     if (!taskInfo.IsEnabled)
                     {
-                        throw new TaskCanceledException();
+                        //throw new TaskCanceledException();
                     }
                 }
             }
@@ -209,7 +208,8 @@ namespace Microsoft.PSharp.Scheduling
             {
                 Output.Debug(DebugType.Testing, "<ScheduleDebug> Schedule explored.");
                 this.KillRemainingTasks();
-                throw new TaskCanceledException();
+                return false;
+                //throw new TaskCanceledException();
             }
 
             if (Configuration.CheckLiveness && Configuration.CacheProgramState &&
@@ -286,7 +286,7 @@ namespace Microsoft.PSharp.Scheduling
 
                 if (!taskInfo.IsEnabled)
                 {
-                    throw new TaskCanceledException();
+                    //throw new TaskCanceledException();
                 }
             }
         }
@@ -345,7 +345,8 @@ namespace Microsoft.PSharp.Scheduling
         /// <param name="terminateScheduler">Terminate the scheduler</param>
         internal void NotifyAssertionFailure(string text, bool terminateScheduler = true)
         {
-            CheckCancellation();  // Help keep the first assertion.
+            // Help keep the first assertion.
+            if (IsCanceled()) return;
 
             this.BugReport = text;
             ErrorReporter.Report(text);
@@ -364,6 +365,7 @@ namespace Microsoft.PSharp.Scheduling
         internal void Stop()
         {
             this.KillRemainingTasks();
+            // Callers of Stop do expect it to throw an exception.
             throw new TaskCanceledException();
         }
 
