@@ -129,6 +129,8 @@ namespace Microsoft.PSharp.DynamicAnalysis
         {
             Output.Print("... Using '{0}' strategy", AnalysisContext.Strategy);
 
+            PSharpRuntime.TestVars = Configuration.TestVars;
+
             Task task = new Task(() =>
             {
                 for (int i = 0; i < Configuration.SchedulingIterations; i++)

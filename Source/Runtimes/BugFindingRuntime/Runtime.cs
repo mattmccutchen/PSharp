@@ -77,9 +77,18 @@ namespace Microsoft.PSharp
         /// </summary>
         internal static LivenessChecker LivenessChecker;
 
+        internal static Dictionary<string, string> TestVars;
+
         #endregion
 
         #region public API
+
+        public static string GetTestVar(string name)
+        {
+            string value;
+            TestVars.TryGetValue(name, out value);
+            return value;
+        }
 
         public static MachineId CurrentMachineId
         {

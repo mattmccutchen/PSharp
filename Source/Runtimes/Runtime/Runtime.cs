@@ -82,6 +82,12 @@ namespace Microsoft.PSharp
             PSharpRuntime.Port = "";
         }
 
+        public static string GetTestVar(string name)
+        {
+            // Does not apply in production
+            return null;
+        }
+
         public static MachineId CurrentMachineId
         {
             get

@@ -181,6 +181,11 @@ namespace Microsoft.PSharp.Tooling
         /// </summary>
         internal static bool CacheProgramState;
 
+        /// <summary>
+        /// Custom variables whose meaning depends on the test.
+        /// </summary>
+        internal static Dictionary<string, string> TestVars;
+
         #endregion
 
         #region remote options
@@ -242,6 +247,7 @@ namespace Microsoft.PSharp.Tooling
             Configuration.PrintTrace = false;
             Configuration.SuppressTrace = false;
             Configuration.CacheProgramState = true;
+            Configuration.TestVars = new Dictionary<string, string>();
 
             Configuration.NumberOfContainers = 1;
             Configuration.ContainerId = 0;

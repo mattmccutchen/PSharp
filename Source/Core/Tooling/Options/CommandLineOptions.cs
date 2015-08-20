@@ -197,6 +197,12 @@ namespace Microsoft.PSharp.Tooling
                     Configuration.RunDynamicAnalysis = true;
                     Configuration.ProjectName = this.Options[idx].Substring(6);
                 }
+                else if (this.Options[idx].ToLower().StartsWith("/testvar:") &&
+                    this.Options[idx].Contains("="))
+                {
+                    string[] parts = this.Options[idx].Split(new char[] { '=' }, 2);
+                    Configuration.TestVars[parts[0]] = parts[1];
+                }
                 else if (this.Options[idx].ToLower().StartsWith("/sch:") &&
                     this.Options[idx].Length > 5)
                 {
