@@ -182,6 +182,11 @@ namespace Microsoft.PSharp.Tooling
         internal static bool CacheProgramState;
 
         /// <summary>
+        /// Fixed seed for the random scheduling strategy.
+        /// </summary>
+        internal static int? SchedulingRandomSeed;
+
+        /// <summary>
         /// Custom variables whose meaning depends on the test.
         /// </summary>
         internal static Dictionary<string, string> TestVars;
@@ -247,6 +252,7 @@ namespace Microsoft.PSharp.Tooling
             Configuration.PrintTrace = false;
             Configuration.SuppressTrace = false;
             Configuration.CacheProgramState = true;
+            Configuration.SchedulingRandomSeed = null;
             Configuration.TestVars = new Dictionary<string, string>();
 
             Configuration.NumberOfContainers = 1;

@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Microsoft.PSharp.Scheduling;
+using Microsoft.PSharp.Tooling;
 
 namespace Microsoft.PSharp.DynamicAnalysis
 {
@@ -32,6 +33,8 @@ namespace Microsoft.PSharp.DynamicAnalysis
         /// </summary>
         private int Seed;
 
+        private int Iteration;
+
         /// <summary>
         /// Randomizer.
         /// </summary>
@@ -44,7 +47,19 @@ namespace Microsoft.PSharp.DynamicAnalysis
         public RandomSchedulingStrategy(int seed)
         {
             this.Seed = seed;
-            this.Random = new Random(seed);
+            this.Iteration = 0;
+        }
+
+        void MaybeInitIteration()
+        {
+            if (this.Random == null)
+            {
+                int iterationSeed = this.Seed + this.Iteration;
+                Output.Debug(DebugType.Runtime,
+                    "<StrategyLog> RandomSchedulingStrategy starting iteration with seed {0}.",
+                    iterationSeed);
+                this.Random = new Random(iterationSeed);
+            }
         }
 
         /// <summary>
@@ -55,6 +70,7 @@ namespace Microsoft.PSharp.DynamicAnalysis
         /// <returns>Boolean value</returns>
         bool ISchedulingStrategy.TryGetNext(out TaskInfo next, List<TaskInfo> tasks)
         {
+            MaybeInitIteration();
             var enabledTasks = tasks.Where(task => task.IsEnabled).ToList();
             if (enabledTasks.Count == 0)
             {
@@ -74,6 +90,7 @@ namespace Microsoft.PSharp.DynamicAnalysis
         /// <returns>Boolean value</returns>
         bool ISchedulingStrategy.GetNextChoice(out bool next)
         {
+            MaybeInitIteration();
             next = false;
             if (this.Random.Next(2) == 1)
             {
@@ -106,7 +123,8 @@ namespace Microsoft.PSharp.DynamicAnalysis
         /// </summary>
         void ISchedulingStrategy.Reset()
         {
-
+            this.Iteration++;
+            this.Random = null;
         }
     }
 }

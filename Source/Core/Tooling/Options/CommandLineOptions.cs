@@ -208,6 +208,17 @@ namespace Microsoft.PSharp.Tooling
                 {
                     Configuration.SchedulingStrategy = this.Options[idx].Substring(5);
                 }
+                else if (this.Options[idx].ToLower().StartsWith("/schseed:") &&
+                    this.Options[idx].Length > 9)
+                {
+                    int seed;
+                    if (!int.TryParse(this.Options[idx].Substring(9), out seed))
+                    {
+                        ErrorReporter.ReportAndExit("Please give a valid random seed " +
+                            "'/schseed:[x]', where [x] is a signed 32-bit integer.");
+                    }
+                    Configuration.SchedulingRandomSeed = seed;
+                }
                 else if (this.Options[idx].ToLower().StartsWith("/i:") &&
                     this.Options[idx].Length > 3)
                 {

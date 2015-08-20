@@ -86,7 +86,8 @@ namespace Microsoft.PSharp.DynamicAnalysis
 
             if (AnalysisContext.Strategy == SchedulingStrategy.Random)
             {
-                SCTEngine.Strategy = new RandomSchedulingStrategy(DateTime.Now.Millisecond);
+                SCTEngine.Strategy = new RandomSchedulingStrategy(
+                    Configuration.SchedulingRandomSeed ?? DateTime.Now.Millisecond);
             }
             else if (AnalysisContext.Strategy == SchedulingStrategy.DFS)
             {
