@@ -288,6 +288,7 @@ namespace Microsoft.PSharp
             if (PSharpRuntime.BugFinder.IsCanceled())
             {
                 Output.Debug(DebugType.Runtime, "<SendLog> Ignoring send because the current machine is canceled.");
+                return;
             }
 
             MachineId currentMachineId = PSharpRuntime.BugFinder.CurrentMachineId;
