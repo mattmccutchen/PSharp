@@ -129,7 +129,10 @@ namespace Microsoft.PSharp.Scheduling
         internal void Schedule()
         {
             TaskInfo taskInfo = GetTaskInfoChecked();
-            if (taskInfo == null || IsCanceled() /* can this happen? */)
+            if (taskInfo == null ||
+                // Trying to cancel (distinguish from completed case) and still
+                // calling Schedule; can this happen?
+                (!taskInfo.IsEnabled && !taskInfo.IsCompleted))
             {
                 return;
             }
@@ -297,6 +300,11 @@ namespace Microsoft.PSharp.Scheduling
         internal void NotifyTaskCompleted()
         {
             TaskInfo taskInfo = CurrentTaskInfo.Value;
+
+            if (!taskInfo.IsEnabled)
+                // Task exiting after cancellation.
+                // Normal completion steps do not apply.
+                return;
             
             Output.Debug(DebugType.Testing, "<ScheduleDebug> Completed task {0} of machine {1}({2}).",
                 taskInfo.Id, taskInfo.Machine.GetType(), taskInfo.Machine.Id.MVal);
