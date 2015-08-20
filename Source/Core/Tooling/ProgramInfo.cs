@@ -61,7 +61,7 @@ namespace Microsoft.PSharp.Tooling
             }
             catch (Exception ex)
             {
-                Output.Print(ex.StackTrace);
+                Output.Print(ex.ToString());
                 ErrorReporter.ReportAndExit("Please give a valid solution path.");
             }
 
