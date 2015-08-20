@@ -200,7 +200,7 @@ namespace Microsoft.PSharp.Tooling
                 else if (this.Options[idx].ToLower().StartsWith("/testvar:") &&
                     this.Options[idx].Contains("="))
                 {
-                    string[] parts = this.Options[idx].Split(new char[] { '=' }, 2);
+                    string[] parts = this.Options[idx].Substring(9).Split(new char[] { '=' }, 2);
                     Configuration.TestVars[parts[0]] = parts[1];
                 }
                 else if (this.Options[idx].ToLower().StartsWith("/sch:") &&
