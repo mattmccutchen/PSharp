@@ -16,6 +16,8 @@ using System;
 
 using Microsoft.PSharp.DynamicAnalysis;
 using Microsoft.PSharp.Tooling;
+using System.IO;
+using Microsoft.CodeAnalysis;
 
 namespace Microsoft.PSharp
 {
@@ -32,6 +34,20 @@ namespace Microsoft.PSharp
             if (!Configuration.RunDynamicAnalysis)
             {
                 return;
+            }
+
+            if (Configuration.AssembliesToBeAnalyzed.Count == 0)
+            {
+                // Copy the relevant logic from CompilationEngine so we can test
+                // without compiling.  It would probably be OK in the current
+                // codebase to do this unconditionally rather than generate
+                // Configuration.AssembliesToBeAnalyzed during compilation at
+                // all.
+                Project proj = ProgramInfo.GetProjectWithName(Configuration.ProjectName);
+                string dll = (Configuration.OutputFilePath == ""
+                    ? Path.GetDirectoryName(proj.OutputFilePath) : Configuration.OutputFilePath)
+                    + Path.DirectorySeparatorChar + proj.AssemblyName + ".dll";
+                Configuration.AssembliesToBeAnalyzed.Add(dll);
             }
 
             foreach (var dll in Configuration.AssembliesToBeAnalyzed)
