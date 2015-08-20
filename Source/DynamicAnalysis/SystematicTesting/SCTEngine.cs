@@ -261,8 +261,12 @@ namespace Microsoft.PSharp.DynamicAnalysis
         private static void PrintTrace(StringWriter sw)
         {
             var name = Path.GetFileNameWithoutExtension(AnalysisContext.Assembly.Location);
-            var directory = Path.GetDirectoryName(AnalysisContext.Assembly.Location) +
-                Path.DirectorySeparatorChar + "traces" + Path.DirectorySeparatorChar;
+            // Put traces in the working directory so I can run several P# SCT
+            // instances in parallel without having to initialize multiple
+            // output directories with Visual Studio (see
+            // https://github.com/p-org/PSharp/issues/11). ~ Matt 2015-08-19
+            var directory = /*Path.GetDirectoryName(AnalysisContext.Assembly.Location) +
+                Path.DirectorySeparatorChar +*/ "traces" + Path.DirectorySeparatorChar;
 
             Directory.CreateDirectory(directory);
 
