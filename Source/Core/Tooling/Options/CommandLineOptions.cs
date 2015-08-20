@@ -236,6 +236,11 @@ namespace Microsoft.PSharp.Tooling
                 {
                     Configuration.FullExploration = true;
                 }
+                else if (this.Options[idx].ToLower().Equals("/exploretrace"))
+                {
+                    Configuration.FullExploration = true;
+                    Configuration.PrintTraceWithExploration = true;
+                }
                 else if (this.Options[idx].ToLower().StartsWith("/db:") &&
                     this.Options[idx].Length > 4)
                 {

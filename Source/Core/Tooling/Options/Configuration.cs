@@ -148,6 +148,11 @@ namespace Microsoft.PSharp.Tooling
         internal static bool FullExploration;
 
         /// <summary>
+        /// If false (default), never print traces in FullExploration mode.
+        /// </summary>
+        internal static bool PrintTraceWithExploration;
+
+        /// <summary>
         /// Depth bound. By default it is 1000.
         /// </summary>
         internal static int DepthBound;
@@ -246,6 +251,7 @@ namespace Microsoft.PSharp.Tooling
             Configuration.SchedulingStrategy = "";
             Configuration.SchedulingIterations = 1;
             Configuration.FullExploration = false;
+            Configuration.PrintTraceWithExploration = false;
             Configuration.DepthBound = 10000;
             Configuration.SafetyPrefixBound = 0;
             Configuration.CheckLiveness = false;
