@@ -219,6 +219,12 @@ namespace Microsoft.PSharp.Tooling
                     }
                     Configuration.SchedulingRandomSeed = seed;
                 }
+                else if (this.Options[idx].ToLower().StartsWith("/sch-param:") &&
+                    this.Options[idx].Contains("="))
+                {
+                    string[] parts = this.Options[idx].Substring(11).Split(new char[] { '=' }, 2);
+                    Configuration.SchedulingParams[parts[0]] = parts[1];
+                }
                 else if (this.Options[idx].ToLower().StartsWith("/i:") &&
                     this.Options[idx].Length > 3)
                 {
@@ -313,10 +319,11 @@ namespace Microsoft.PSharp.Tooling
 
             if (!Configuration.SchedulingStrategy.Equals("") &&
                 !Configuration.SchedulingStrategy.Equals("random") &&
-                !Configuration.SchedulingStrategy.Equals("dfs"))
+                !Configuration.SchedulingStrategy.Equals("dfs") &&
+                !Configuration.SchedulingStrategy.Equals("pct"))
             {
                 ErrorReporter.ReportAndExit("Please give a valid scheduling strategy " +
-                    "'/sch:[x]', where [x] is 'random' or 'dfs'.");
+                    "'/sch:[x]', where [x] is 'random', 'dfs', or 'pct'.");
             }
         }
 

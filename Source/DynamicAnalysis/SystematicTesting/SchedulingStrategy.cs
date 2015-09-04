@@ -26,6 +26,7 @@ namespace Microsoft.PSharp.DynamicAnalysis
         /// <summary>
         /// Depth-first search scheduling.
         /// </summary>
-        DFS = 1
+        DFS = 1,
+        PCT = 2
     }
 }

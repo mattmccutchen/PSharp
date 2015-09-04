@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="AnalysisContext.cs" />
     <Compile Include="SystematicTesting\Schedulers\DFSSchedulingStrategy.cs" />
+    <Compile Include="SystematicTesting\Schedulers\PCTSchedulingStrategy.cs" />
     <Compile Include="SystematicTesting\Schedulers\RandomSchedulingStrategy.cs" />
     <Compile Include="SystematicTesting\SchedulingStrategy.cs" />
     <Compile Include="SystematicTesting\SCTEngine.cs" />

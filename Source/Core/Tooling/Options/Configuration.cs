@@ -192,6 +192,13 @@ namespace Microsoft.PSharp.Tooling
         internal static int? SchedulingRandomSeed;
 
         /// <summary>
+        /// Parameters whose meaning depends on the scheduler.
+        /// </summary>
+        // XXX Copied the design of TestVars, but there's a stronger case to be
+        // made for imposing more structure on this at the Configuration level.
+        internal static Dictionary<string, string> SchedulingParams;
+
+        /// <summary>
         /// Custom variables whose meaning depends on the test.
         /// </summary>
         internal static Dictionary<string, string> TestVars;
@@ -259,6 +266,7 @@ namespace Microsoft.PSharp.Tooling
             Configuration.SuppressTrace = false;
             Configuration.CacheProgramState = true;
             Configuration.SchedulingRandomSeed = null;
+            Configuration.SchedulingParams = new Dictionary<string, string>();
             Configuration.TestVars = new Dictionary<string, string>();
 
             Configuration.NumberOfContainers = 1;

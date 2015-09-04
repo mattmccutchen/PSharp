@@ -111,6 +111,10 @@ namespace Microsoft.PSharp.DynamicAnalysis
             {
                 AnalysisContext.Strategy = SchedulingStrategy.DFS;
             }
+            else if (Configuration.SchedulingStrategy.Equals("pct"))
+            {
+                AnalysisContext.Strategy = SchedulingStrategy.PCT;
+            }
         }
 
         /// <summary>

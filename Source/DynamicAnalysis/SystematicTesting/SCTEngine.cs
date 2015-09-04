@@ -92,7 +92,13 @@ namespace Microsoft.PSharp.DynamicAnalysis
             else if (AnalysisContext.Strategy == SchedulingStrategy.DFS)
             {
                 SCTEngine.Strategy = new DFSSchedulingStrategy();
+                // Why? ~ Matt
                 Configuration.FullExploration = false;
+            }
+            else if (AnalysisContext.Strategy == SchedulingStrategy.PCT)
+            {
+                SCTEngine.Strategy = new PCTSchedulingStrategy(
+                    Configuration.SchedulingRandomSeed ?? DateTime.Now.Millisecond);
             }
 
             if (!Configuration.Debug.Contains(DebugType.All) &&
